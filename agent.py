@@ -1,4 +1,5 @@
 import pandas as pd
+import matplotlib.pyplot as plt
 from utils import ask_llm
 def load_data(file):
     try:
@@ -6,30 +7,37 @@ def load_data(file):
     except:
         return pd.read_excel(file)
 
+def clean_data(df):
+    df = df.drop_duplicates()
+    df = df.fillna(method='ffill')  # simple fix
+    return df
 
 def analyze_data(df):
     summary = df.describe(include='all').to_string()
-    sample=df.head(5).to_string()
+    return summary
 
-    return f"""
-    SUMMARY:
-    {summary}
 
-    MISSING VALUES
-    {sample}
-    """
+def create_charts(df):
+    charts = []
 
+    for col in df.select_dtypes(include='number').columns:
+        plt.figure()
+        df[col].hist()
+        filename = f"{col}.png"
+        plt.savefig(filename)
+        charts.append(filename)
+        plt.close()
+
+    return charts
 
 def get_insights(summary):
     prompt = f"""
     You are a professional data analyst.
 
     Give:
-    1. 3 key insights
-    2. 2 trends
-    3. 1 anomaly (if any)
-
-    Keep answer short and clear.
+    - key insights
+    - Trends
+    - Anomaly
 
     Data:
     {summary}
@@ -38,7 +46,7 @@ def get_insights(summary):
     return ask_llm(prompt)
 
 def ask_question(df, question):
-    sample = df.head(5).to_string()
+    sample = df.head().to_string()
 
     prompt = f"""
     You are a data analyst.
@@ -50,4 +58,12 @@ def ask_question(df, question):
     {question}
     """
 
+    return ask_llm(prompt)
+
+def suggest_decisions(summary):
+    prompt = f"""
+    Based on this data, suggest business decisions:
+
+    {summary}
+    """
     return ask_llm(prompt)
