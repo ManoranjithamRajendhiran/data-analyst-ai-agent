@@ -9,7 +9,7 @@ def load_data(file):
 
 def clean_data(df):
     df = df.drop_duplicates()
-    df = df.fillna(method='ffill')  # simple fix
+    df = df.ffill()  # simple fix
     return df
 
 def analyze_data(df):

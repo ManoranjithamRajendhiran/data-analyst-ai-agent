@@ -1,6 +1,18 @@
 import streamlit as st
 from agent import *
 
+def show_kpis(df):
+    import streamlit as st
+
+    col1, col2, col3 = st.columns(3)
+
+    col1.metric("Rows", len(df))
+    col2.metric("Columns", len(df.columns))
+
+    numeric = df.select_dtypes(include='number')
+    if not numeric.empty:
+        col3.metric("Avg Value", round(numeric.mean().mean(), 2))
+        
 st.set_page_config(layout="wide")
 st.title("📊 AI Data Analyst Agent")
 
