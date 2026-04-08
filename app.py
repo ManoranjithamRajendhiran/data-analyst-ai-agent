@@ -60,7 +60,7 @@ if file:
         summary = analyze_data(df)
 
         if st.button("Generate Insights"):
-            insights = generate_insights(summary)
+            insights = get_insights(summary)
             st.success(insights)
 
         st.subheader("💡 Decision Suggestions")
