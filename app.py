@@ -50,9 +50,9 @@ if file:
 
         for i, chart in enumerate(charts):
             if i % 2 == 0:
-                col1.image(chart)
+                col1.pyplot(chart)
             else:
-                col2.image(chart)
+                col2.pyplot(chart)
 
     with tab2:
         st.subheader("🧠 AI Insights")
@@ -66,7 +66,7 @@ if file:
         st.subheader("💡 Decision Suggestions")
 
         if st.button("Suggest Decisions"):
-            decisions = suggest_decisions(summary)
+            decisions = suggest_decisions(df)
             st.info(decisions)
 
     with tab3:

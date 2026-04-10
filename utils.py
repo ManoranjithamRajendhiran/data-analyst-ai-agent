@@ -9,7 +9,7 @@ def ask_llm(prompt):
             "prompt": prompt,
             "stream": False,
             "option": {
-                "num_predict":150
+                "num_predict":100
             }
         }
     )

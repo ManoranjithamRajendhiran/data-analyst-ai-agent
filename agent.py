@@ -13,22 +13,22 @@ def clean_data(df):
     return df
 
 def analyze_data(df):
-    summary = df.describe(include='all').to_string()
+    summary = df.describe().round(2).to_string()
     return summary
 
 
 def create_charts(df):
-    charts = []
+    figures = []
+    numeric_cols = df.select_dtypes(include='number').columns
 
-    for col in df.select_dtypes(include='number').columns:
-        plt.figure()
-        df[col].hist()
-        filename = f"{col}.png"
-        plt.savefig(filename)
-        charts.append(filename)
-        plt.close()
+    for col in numeric_cols:
+        fig, ax = plt.subplots()
+        df[col].hist(ax=ax)
+        ax.set_title(f"Distribution of {col}")
 
-    return charts
+        figures.append(fig) 
+
+    return figures
 
 def get_insights(summary):
     prompt = f"""
@@ -46,24 +46,45 @@ def get_insights(summary):
     return ask_llm(prompt)
 
 def ask_question(df, question):
-    sample = df.head().to_string()
+    summary = df.describe().round(2).to_string()
+    columns = ", ".join(df.columns)
 
     prompt = f"""
     You are a data analyst.
 
-    Dataset sample:
-    {sample}
+    Dataset columns:
+    {columns}
 
-    Answer this question:
+    Statistical summary:
+    {summary}
+
+    Question:
     {question}
+
+    Answer clearly based on data.
     """
 
     return ask_llm(prompt)
 
-def suggest_decisions(summary):
-    prompt = f"""
-    Based on this data, suggest business decisions:
+def extract_patterns(df):
+    insights = ""
 
-    {summary}
+    for col in df.select_dtypes(include='number').columns:
+        insights += f"{col}: mean={df[col].mean()}, max={df[col].max()}, min={df[col].min()}\n"
+
+    return insights
+def suggest_decisions(df):
+    patterns = extract_patterns(df)
+
+    prompt = f"""
+    You are a business analyst.
+
+    Patterns:
+    {patterns}
+
+    Give:
+    - 3 business decisions
+    - Based on these patterns
     """
+
     return ask_llm(prompt)
