@@ -1,21 +1,6 @@
-# Core
-python-dotenv
-
-# Data Processing
 pandas
 numpy
-
-# Visualization
 matplotlib
 seaborn
-
-# Ollama API
 ollama
-
-# Utilities
-tqdm
-rich
-
-# Optional (if using notebooks)
-notebook
-ipykernel
+python-dotenv
