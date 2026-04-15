@@ -62,3 +62,67 @@ data-analyst-ai-agent
 - app.py
 - requirements.txt
 - README.md
+
+---
+
+## 💬 Example Queries
+
+- "Give me summary statistics of this dataset"
+- "Show correlation between features"
+- "Visualize sales trends over time"
+- "Find anomalies in the data"
+
+---
+
+## 📊 Output
+
+**The agent generates:**
+
+- ✅ Cleaned Data
+- 📈 Visualizations
+- 🧠 Insights
+- 📌 Key Findings
+- 🧠 Key Concepts
+
+---
+
+## AI Agents & Tool Usage
+
+- Prompt Engineering
+- Exploratory Data Analysis (EDA)
+- Data Visualization
+- Automated Decision Making
+
+---
+
+## 📌 Use Cases
+
+- Business analytics
+- Academic projects
+- Financial analysis
+- Marketing insights
+
+---
+
+## 🚧 Challenges
+
+- Handling ambiguous queries
+- Selecting correct analysis steps
+- Generating meaningful insights
+
+---
+
+## 🔮 Future Improvements
+
+- Web UI (Streamlit)
+- Interactive dashboards
+- SQL integration
+- Voice-based queries
+- Multi-agent system
+
+---
+
+## 🙋‍♂️ Author
+
+Mano Ranjitham
+**AI & Data Science Student**
