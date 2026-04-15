@@ -55,10 +55,10 @@ This project bridges that gap by combining:
 
 ## 📂 Project Structure
 
-data-analyst-ai-agent/
-│
-├── utils.py
-├── agent.py 
-├── app.py       
-├── requirements.txt
-└── README.md
+data-analyst-ai-agent
+
+─ utils.py
+─ agent.py 
+─ app.py       
+─ requirements.txt
+─ README.md
