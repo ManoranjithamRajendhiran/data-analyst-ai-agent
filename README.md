@@ -29,19 +29,39 @@ This project bridges that gap by combining:
 
 ---
 
-## 🏗️ Architecture
+## ⚙️ Tech Stack
 
-User Input (Natural Language)
-        ↓
-     LLM Model
-        ↓
-   Agent Controller
-        ↓
- ┌─────────────────────────┐
- │ Data Cleaning Module    │
- │ EDA Module              │
- │ Visualization Module    │
- │ Query/Logic Module      │
- └─────────────────────────┘
-        ↓
- Final Output (Insights + Charts)
+**🧠 AI / Agent Layer**
+
+- Ollama-phi3 Model
+- Prompt Engineering
+- Agent Workflow Logic
+
+**📊 Data Processing**
+
+- Pandas
+- NumPy
+
+**📈 Visualization**
+
+- Matplotlib
+- Seaborn
+
+**🛠️ Backend**
+
+- Python
+
+---
+
+## 📂 Project Structure
+
+data-analyst-ai-agent/
+│
+├── agents/            
+├── tools/             
+├── data/              
+├── notebooks/         
+├── main.py            
+├── config.py          
+├── requirements.txt
+└── README.md
