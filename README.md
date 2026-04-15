@@ -57,8 +57,8 @@ This project bridges that gap by combining:
 
 data-analyst-ai-agent
 
-─ utils.py
-─ agent.py 
-─ app.py       
-─ requirements.txt
-─ README.md
+- utils.py
+- agent.py
+- app.py
+- requirements.txt
+- README.md
