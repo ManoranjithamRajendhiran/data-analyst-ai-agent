@@ -1,16 +1,9 @@
-import requests
+import pandas as pd
 
-
-def ask_llm(prompt):
-    response = requests.post(
-        "http://localhost:11434/api/generate",
-        json={
-            "model": "phi3",
-            "prompt": prompt,
-            "stream": False,
-            "option": {
-                "num_predict":100
-            }
-        }
-    )
-    return response.json()["response"]
+def summarize_df(df):
+    return {
+        "rows": df.shape[0],
+        "cols": df.shape[1],
+        "columns": list(df.columns),
+        "missing": df.isnull().sum().to_dict()
+    }

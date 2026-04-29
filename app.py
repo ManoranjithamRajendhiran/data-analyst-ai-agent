@@ -1,82 +1,160 @@
 import streamlit as st
-from agent import *
+import pandas as pd
+import plotly.express as px
+from agent import ask_claude
+from utils import summarize_df
 
-def show_kpis(df):
-    import streamlit as st
+st.set_page_config(page_title="AI Data Analyst", layout="wide")
 
-    col1, col2, col3 = st.columns(3)
+st.title("📊 AI Data Analyst Pro")
+st.caption("Upload CSV • Smart Charts • AI Insights • Business Recommendations")
 
-    col1.metric("Rows", len(df))
-    col2.metric("Columns", len(df.columns))
+# ---------------- SESSION ----------------
+if "history" not in st.session_state:
+    st.session_state.history = []
 
-    numeric = df.select_dtypes(include='number')
-    if not numeric.empty:
-        col3.metric("Avg Value", round(numeric.mean().mean(), 2))
-        
-st.set_page_config(layout="wide")
-st.title("📊 AI Data Analyst Agent")
-
-# Sidebar Filters
-st.sidebar.header("🔍 Filters")
-
-file = st.file_uploader("Upload CSV or Excel")
+# ---------------- FILE UPLOAD ----------------
+file = st.file_uploader("Upload CSV", type=["csv"])
 
 if file:
-    df = load_data(file)
-    df = clean_data(df)
+    df = pd.read_csv(file)
 
-    # Filters
-    column = st.sidebar.selectbox("Select Column", df.columns)
+    # ---------------- TOP SECTION ----------------
+    col1, col2 = st.columns(2)
 
-    if df[column].dtype == 'object':
-        value = st.sidebar.selectbox("Value", df[column].unique())
-        df = df[df[column] == value]
+    with col1:
+        st.subheader("📁 Dataset Preview")
+        st.dataframe(df.head(), use_container_width=True)
 
-    # Tabs
-    tab1, tab2, tab3 = st.tabs(["📊 Dashboard", "🧠 Insights", "💬 Ask"])
+    with col2:
+        st.subheader("📌 Quick Stats")
+        st.metric("Rows", df.shape[0])
+        st.metric("Columns", df.shape[1])
+        st.metric("Missing Values", int(df.isnull().sum().sum()))
 
-    with tab1:
-        st.subheader("📌 Overview")
-        show_kpis(df)
+    # ---------------- CHART SECTION ----------------
+    numeric_cols = df.select_dtypes(include="number").columns.tolist()
 
-        st.subheader("📄 Data Preview")
-        st.dataframe(df.head())
+    if len(numeric_cols) >= 1:
 
-        st.subheader("📈 Charts")
+        st.markdown("---")
+        st.subheader("📈 Smart Visualization")
 
-        charts = create_charts(df)
+        selected_col = st.selectbox(
+            "Choose Numeric Column",
+            numeric_cols
+        )
 
-        col1, col2 = st.columns(2)
+        chart_type = st.selectbox(
+            "Choose Chart Type",
+            ["Histogram", "Box Plot", "Line Chart", "Bar Chart"]
+        )
 
-        for i, chart in enumerate(charts):
-            if i % 2 == 0:
-                col1.pyplot(chart)
-            else:
-                col2.pyplot(chart)
+        if chart_type == "Histogram":
+            chart = px.histogram(
+                df,
+                x=selected_col,
+                nbins=20,
+                title=f"Distribution of {selected_col}"
+            )
 
-    with tab2:
-        st.subheader("🧠 AI Insights")
+        elif chart_type == "Box Plot":
+            chart = px.box(
+                df,
+                y=selected_col,
+                title=f"Outlier Detection - {selected_col}"
+            )
 
-        summary = analyze_data(df)
+        elif chart_type == "Line Chart":
+            chart = px.line(
+                df,
+                y=selected_col,
+                title=f"Trend of {selected_col}"
+            )
 
-        if st.button("Generate Insights"):
-            insights = get_insights(summary)
-            st.success(insights)
+        else:
+            chart = px.bar(
+                df.head(20),
+                y=selected_col,
+                title=f"Top Values of {selected_col}"
+            )
 
-        st.subheader("💡 Decision Suggestions")
+        st.plotly_chart(chart, use_container_width=True)
 
-        if st.button("Suggest Decisions"):
-            decisions = suggest_decisions(df)
-            st.info(decisions)
+        # -------- BUTTON TO GENERATE INSIGHT --------
+        if st.button("Generate Chart Insight"):
 
-    with tab3:
-        st.subheader("💬 Ask Questions")
+            chart_prompt = f"""
+You are a senior business analyst.
 
-        question = st.text_input("Enter your question")
+Analyze this column:
 
-        if question:
-            answer = ask_question(df, question)
-            st.write(answer)
+Column Name: {selected_col}
+Mean: {df[selected_col].mean():.2f}
+Median: {df[selected_col].median():.2f}
+Minimum: {df[selected_col].min():.2f}
+Maximum: {df[selected_col].max():.2f}
+Standard Deviation: {df[selected_col].std():.2f}
 
+Give:
+1. Distribution Trend
+2. Outliers / unusual values
+3. Risk
+4. Recommendation
+"""
+
+            with st.spinner("Generating insight..."):
+                chart_insight = ask_claude(chart_prompt)
+
+            st.subheader("🤖 AI Chart Insight")
+            st.info(chart_insight)
+
+    # ---------------- QUESTION SECTION ----------------
+    st.markdown("---")
+    st.subheader("💬 Ask Questions About Dataset")
+
+    question = st.text_input("Ask your business question")
+
+    if st.button("Analyze Dataset"):
+
+        summary = summarize_df(df)
+
+        prompt = f"""
+You are a senior business analyst.
+
+Dataset Summary:
+Rows: {summary['rows']}
+Columns: {summary['columns']}
+Missing Values: {summary['missing']}
+
+Sample Rows:
+{df.head(3).to_string()}
+
+Question:
+{question}
+
+Respond in this format:
+1. Direct Answer
+2. Key Insight
+3. Recommendation
+4. Risk
+"""
+
+        with st.spinner("Claude is analyzing..."):
+            answer = ask_claude(prompt)
+
+        st.session_state.history.append(
+            {"question": question, "answer": answer}
+        )
+
+        st.subheader("📌 Claude Analysis")
+        st.success(answer)
+
+# ---------------- SIDEBAR ----------------
+st.sidebar.title("💬 Chat History")
+
+if len(st.session_state.history) == 0:
+    st.sidebar.info("No history yet")
 else:
-    st.info("👆 Upload a dataset to start")
+    for item in st.session_state.history[::-1]:
+        st.sidebar.write("**Q:**", item["question"])
